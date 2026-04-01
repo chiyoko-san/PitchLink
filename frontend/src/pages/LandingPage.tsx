@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { PhoneOff, Send, FileText, Shield, ChevronRight } from 'lucide-react';
+import { PhoneOff, Send, FileText, Shield, Bell, BarChart3, ChevronRight } from 'lucide-react';
 
 export default function LandingPage() {
   return (
@@ -7,7 +7,8 @@ export default function LandingPage() {
       <header className="px-8 py-5 flex items-center justify-between border-b border-gray-100">
         <span className="font-bold text-indigo-600 text-xl">PitchLink</span>
         <div className="flex items-center gap-4">
-          <Link to="/company/acme-corp" className="text-sm text-gray-600 hover:text-gray-900">デモを見る</Link>
+          <Link to="/company/acme-corp" className="text-sm text-gray-600 hover:text-gray-900">公開ページデモ</Link>
+          <Link to="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">管理画面デモ</Link>
           <button className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
             無料で始める
           </button>
