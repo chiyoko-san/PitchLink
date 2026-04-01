@@ -1,4 +1,4 @@
-import { Building2, Globe, Mail, Phone, ExternalLink, Send } from 'lucide-react';
+import { Building2, Globe, Mail, Send } from 'lucide-react';
 import { mockCompany } from '../utils/mockData';
 import { CATEGORY_LABELS, CATEGORY_COLORS } from '../types';
 import { Link } from 'react-router-dom';
