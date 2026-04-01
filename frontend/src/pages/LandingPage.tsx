@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { PhoneOff, Send, FileText, Shield, Bell, BarChart3, ChevronRight } from 'lucide-react';
+import { PhoneOff, Send, FileText, Shield, ChevronRight } from 'lucide-react';
 
 export default function LandingPage() {
   return (
