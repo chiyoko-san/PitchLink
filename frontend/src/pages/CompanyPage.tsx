@@ -1,7 +1,6 @@
 import { Building2, Globe, Mail, Send } from 'lucide-react';
 import { mockCompany } from '../utils/mockData';
 import { CATEGORY_LABELS, CATEGORY_COLORS } from '../types';
-import { Link } from 'react-router-dom';
 
 export default function CompanyPage() {
   const company = mockCompany;
