@@ -1,0 +1,137 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Category {
+  marketing
+  system
+  hr
+  finance
+  executive
+  other
+}
+
+enum PitchStatus {
+  unread
+  read
+  saved
+  dismissed
+  blocked
+}
+
+enum AttachmentType {
+  pdf
+  video
+  link
+  image
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  companyName String
+  email       String   @unique
+  password    String
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pitchesSent   Pitch[]        @relation("SentPitches")
+  notifications Notification[]
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  logoUrl     String?
+  industry    String?
+  website     String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  departments Department[]
+  pitches     Pitch[]
+}
+
+model Department {
+  id           String   @id @default(cuid())
+  companyId    String
+  name         String
+  category     Category
+  contactEmail String?
+  slackWebhook String?
+  allowPitches Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  pitches Pitch[]
+}
+
+model Pitch {
+  id           String      @id @default(cuid())
+  senderId     String
+  companyId    String
+  departmentId String?
+  title        String
+  body         String
+  category     Category
+  status       PitchStatus @default(unread)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  sender       User         @relation("SentPitches", fields: [senderId], references: [id])
+  company      Company      @relation(fields: [companyId], references: [id])
+  department   Department?  @relation(fields: [departmentId], references: [id])
+  attachments  Attachment[]
+  notifications Notification[]
+  reports      Report[]
+}
+
+model Attachment {
+  id      String         @id @default(cuid())
+  pitchId String
+  name    String
+  type    AttachmentType
+  url     String
+  size    Int?
+
+  pitch Pitch @relation(fields: [pitchId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  pitchId   String
+  type      String   // "new_pitch" | "pitch_opened"
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  pitch Pitch @relation(fields: [pitchId], references: [id])
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  pitchId   String
+  reason    String
+  createdAt DateTime @default(now())
+
+  pitch Pitch @relation(fields: [pitchId], references: [id])
+}
+
+model Block {
+  id              String   @id @default(cuid())
+  companyId       String
+  blockedSenderId String
+  createdAt       DateTime @default(now())
+}
