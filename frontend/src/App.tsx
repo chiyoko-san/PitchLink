@@ -6,7 +6,7 @@ import DashboardPage from './pages/DashboardPage';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/PitchLink">
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/company/:slug" element={<CompanyPage />} />
