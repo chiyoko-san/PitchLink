@@ -12,6 +12,7 @@ export interface Company {
   website?: string;
   departments: Department[];
   createdAt: string;
+  receivingConditions?: string[]; // 受け取りたい提案の条件（売り手向けに公開ページで掲示）
 }
 
 export interface Department {
