@@ -9,9 +9,10 @@ export default function LandingPage() {
         <div className="flex items-center gap-4">
           <Link to="/company/acme-corp" className="text-sm text-gray-600 hover:text-gray-900">公開ページデモ</Link>
           <Link to="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">管理画面デモ</Link>
-          <button className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+          <Link to="/login" className="text-sm text-gray-600 hover:text-gray-900 font-medium">ログイン</Link>
+          <Link to="/login" className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
             無料で始める
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -29,9 +30,9 @@ export default function LandingPage() {
           営業連絡をすべてテキストと資料に置き換えるプラットフォームです。
         </p>
         <div className="flex items-center justify-center gap-4 mt-8">
-          <button className="bg-indigo-600 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-indigo-700 transition text-lg">
+          <Link to="/login" className="bg-indigo-600 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-indigo-700 transition text-lg">
             無料で始める
-          </button>
+          </Link>
           <Link to="/company/acme-corp" className="flex items-center gap-1 text-gray-600 hover:text-indigo-600 font-medium transition">
             デモを見る <ChevronRight className="w-4 h-4" />
           </Link>
