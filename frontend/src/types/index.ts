@@ -51,6 +51,21 @@ export interface Pitch {
   category: Category;
   status: PitchStatus;
   createdAt: string;
+  dismissReason?: string;        // 却下した理由のメモ
+  original?: OriginalSection;    // 「御社オリジナル」セクション
+  reading?: ReadingAnalyticsData; // 有料版: PDFのページ別閲覧時間（売り手向け）
+}
+
+// 「御社オリジナル」: この受け手企業向けに作られた提案であることを示す
+export interface OriginalSection {
+  headline: string;
+  points: string[];
+}
+
+// 有料版の閲覧分析: どの資料のどのページが長く読まれたか
+export interface ReadingAnalyticsData {
+  materialName: string;
+  pages: { page: number; seconds: number }[];
 }
 
 export interface Notification {
