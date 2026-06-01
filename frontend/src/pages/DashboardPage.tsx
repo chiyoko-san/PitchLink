@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Building2, Plus, Trash2, Pencil, Check, X,
   Bell, Mail, Slack, Copy, Eye, Settings,
-  FileText, ChevronRight,
+  FileText, ChevronRight, Lock,
   ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { mockCompany, mockPitches } from '../utils/mockData';
@@ -15,6 +15,10 @@ import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 type Tab = 'pitches' | 'departments' | 'settings';
+
+// 無料枠で開ける件数（新しい順にこの件数まで無料。それより古い資料はロック）
+const FREE_VISIBLE_COUNT = 5;
+
 
 const ALL_CATEGORIES: { value: Category; label: string }[] = [
   { value: 'marketing', label: 'マーケティング' },
@@ -95,6 +99,7 @@ export default function DashboardPage() {
   const [editingDeptId, setEditingDeptId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'all' | 'unread' | 'saved'>('all');
+  const [isPaid, setIsPaid] = useState(false); // 有料版フラグ（実際はプラン判定に接続）
 
   const publicUrl = `https://chiyoko-san.github.io/PitchLink/company/${mockCompany.slug}`;
   const unreadCount = pitches.filter(p => p.status === 'unread').length;
@@ -104,7 +109,10 @@ export default function DashboardPage() {
     if (filterStatus === 'unread') return p.status === 'unread';
     if (filterStatus === 'saved') return p.status === 'saved';
     return p.status !== 'blocked' && p.status !== 'dismissed';
-  });
+  }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  // ロック対象の件数（無料枠を超えた古い資料の数）
+  const lockedCount = isPaid ? 0 : Math.max(0, filteredPitches.length - FREE_VISIBLE_COUNT);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(publicUrl);
@@ -155,6 +163,11 @@ export default function DashboardPage() {
           {unreadCount > 0 && (
             <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{unreadCount}件未読</span>
           )}
+          {/* プラン状態。クリックでデモ切替（実際はプラン判定に接続） */}
+          <button onClick={() => setIsPaid(v => !v)}
+            className={`text-xs font-semibold px-2.5 py-1 rounded-full transition ${isPaid ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+            {isPaid ? '有料版' : '無料版'}
+          </button>
           <a href={publicUrl} target="_blank" rel="noreferrer"
             className="flex items-center gap-1.5 text-sm text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition">
             <Eye className="w-3.5 h-3.5" /> 公開ページを見る
@@ -210,6 +223,20 @@ export default function DashboardPage() {
               ))}
             </div>
 
+            {/* 無料枠の案内バナー（古い資料がロックされているとき） */}
+            {lockedCount > 0 && (
+              <div className="mb-4 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <Lock className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                <p className="text-sm text-amber-800 flex-1">
+                  無料版では直近{FREE_VISIBLE_COUNT}件まで閲覧できます。古い{lockedCount}件は有料版で閲覧可能です。
+                </p>
+                <button onClick={() => setIsPaid(true)}
+                  className="text-xs font-semibold text-white bg-amber-600 px-3 py-1.5 rounded-lg hover:bg-amber-700 transition flex-shrink-0">
+                  有料版にする
+                </button>
+              </div>
+            )}
+
             <div className="space-y-2">
               {filteredPitches.length === 0 && (
                 <div className="text-center py-16 text-gray-400">
@@ -217,9 +244,30 @@ export default function DashboardPage() {
                   <p className="text-sm">該当する資料はありません</p>
                 </div>
               )}
-              {filteredPitches.map(pitch => (
+              {filteredPitches.map((pitch, idx) => {
+                const locked = !isPaid && idx >= FREE_VISIBLE_COUNT;
+                return (
                 <div key={pitch.id}
                   className={`bg-white rounded-xl border p-4 transition ${pitch.status === 'unread' ? 'border-indigo-300' : 'border-gray-200'}`}>
+                  {locked ? (
+                    /* ロック表示（無料枠を超えた古い資料） */
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center">
+                        <Lock className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-400">この資料は有料版で閲覧できます</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {formatDistanceToNow(new Date(pitch.createdAt), { addSuffix: true, locale: ja })}に受信
+                        </p>
+                      </div>
+                      <button onClick={() => setIsPaid(true)}
+                        className="text-xs font-semibold text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition flex-shrink-0">
+                        有料版で見る
+                      </button>
+                    </div>
+                  ) : (
+                  <>
                   <Link to={`/pitch/${pitch.id}`} className="block hover:opacity-80 transition">
                     <div className="flex items-start gap-3">
                       {pitch.sender.avatarUrl
@@ -281,8 +329,11 @@ export default function DashboardPage() {
                         className="text-xs font-medium text-gray-500 px-2.5 py-1 rounded-lg hover:bg-gray-100">却下</button>
                     </div>
                   )}
+                  </>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
