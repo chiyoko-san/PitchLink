@@ -1,14 +1,15 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Building2, Plus, Trash2, Pencil, Check, X,
   Bell, Mail, Slack, Copy, Eye, Settings,
-  FileText, Bookmark, Flag, ChevronRight,
-  ToggleLeft, ToggleRight, ExternalLink
+  FileText, ChevronRight,
+  ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { mockCompany, mockPitches } from '../utils/mockData';
 import {
   CATEGORY_LABELS, CATEGORY_COLORS,
-  type Category, type Department, type Pitch
+  type Category, type Department
 } from '../types';
 import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
@@ -23,84 +24,6 @@ const ALL_CATEGORIES: { value: Category; label: string }[] = [
   { value: 'executive', label: '経営' },
   { value: 'other', label: 'その他' },
 ];
-
-function PitchModal({ pitch, onClose, onAction }: {
-  pitch: Pitch;
-  onClose: () => void;
-  onAction: (id: string, action: 'saved' | 'dismissed') => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            {pitch.sender.avatarUrl
-              ? <img src={pitch.sender.avatarUrl} className="w-10 h-10 rounded-full" alt="" />
-              : <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">{pitch.sender.name[0]}</div>
-            }
-            <div>
-              <p className="font-semibold text-gray-900 text-sm">{pitch.sender.name}</p>
-              <p className="text-xs text-gray-500">{pitch.sender.companyName}</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
-        </div>
-        <div className="px-6 py-5">
-          <div className="flex items-center gap-2 mb-2">
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[pitch.category]}`}>
-              {CATEGORY_LABELS[pitch.category]}
-            </span>
-            <span className="text-xs text-gray-400">
-              {formatDistanceToNow(new Date(pitch.createdAt), { addSuffix: true, locale: ja })}
-            </span>
-          </div>
-          <h3 className="text-base font-bold text-gray-900 mb-3">{pitch.title}</h3>
-          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{pitch.body}</p>
-          {pitch.attachments.length > 0 && (
-            <div className="mt-4 space-y-2">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">添付資料</p>
-              {pitch.attachments.map(att => (
-                <div key={att.id} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
-                  <FileText className="w-4 h-4 text-indigo-500" />
-                  <span className="text-sm text-gray-700 flex-1">{att.name}</span>
-                  <a href={att.url} className="text-xs text-indigo-600 flex items-center gap-0.5 hover:underline">
-                    開く <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="mx-6 mb-4 bg-indigo-50 rounded-xl px-4 py-3">
-          <p className="text-xs font-semibold text-indigo-700 mb-2">興味がある場合は連絡先を確認</p>
-          <div className="flex items-center gap-2 text-sm text-indigo-800">
-            <Mail className="w-3.5 h-3.5" />
-            <span>{pitch.sender.email}</span>
-          </div>
-        </div>
-        <div className="flex gap-2 px-6 pb-5">
-          <button
-            onClick={() => { onAction(pitch.id, 'saved'); onClose(); }}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 transition"
-          >
-            <Bookmark className="w-4 h-4" /> 保存する
-          </button>
-          <button
-            onClick={() => { onAction(pitch.id, 'dismissed'); onClose(); }}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-gray-100 text-gray-700 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-200 transition"
-          >
-            <Trash2 className="w-4 h-4" /> 破棄
-          </button>
-          <button className="flex items-center justify-center gap-1 bg-red-50 text-red-500 px-3 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-100 transition">
-            <Flag className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function DeptForm({
   initial, onSave, onCancel,
@@ -166,7 +89,8 @@ export default function DashboardPage() {
   const [tab, setTab] = useState<Tab>('pitches');
   const [pitches, setPitches] = useState(mockPitches);
   const [departments, setDepartments] = useState(mockCompany.departments);
-  const [activePitch, setActivePitch] = useState<Pitch | null>(null);
+  const [dismissingId, setDismissingId] = useState<string | null>(null); // 却下メモ入力中
+  const [reasonDraft, setReasonDraft] = useState('');
   const [showAddDept, setShowAddDept] = useState(false);
   const [editingDeptId, setEditingDeptId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -190,6 +114,15 @@ export default function DashboardPage() {
 
   const handlePitchAction = (id: string, action: 'saved' | 'dismissed') => {
     setPitches(prev => prev.map(p => p.id === id ? { ...p, status: action } : p));
+  };
+
+  // 却下を確定（理由メモつき）
+  const confirmDismiss = (id: string) => {
+    setPitches(prev => prev.map(p =>
+      p.id === id ? { ...p, status: 'dismissed', dismissReason: reasonDraft.trim() || undefined } : p
+    ));
+    setDismissingId(null);
+    setReasonDraft('');
   };
 
   const handleAddDept = (data: Omit<Department, 'id' | 'companyId'>) => {
@@ -285,38 +218,70 @@ export default function DashboardPage() {
                 </div>
               )}
               {filteredPitches.map(pitch => (
-                <button key={pitch.id} onClick={() => setActivePitch(pitch)}
-                  className={`w-full text-left bg-white rounded-xl border p-4 hover:shadow-md transition ${pitch.status === 'unread' ? 'border-indigo-300' : 'border-gray-200'}`}>
-                  <div className="flex items-start gap-3">
-                    {pitch.sender.avatarUrl
-                      ? <img src={pitch.sender.avatarUrl} className="w-9 h-9 rounded-full flex-shrink-0" alt="" />
-                      : <div className="w-9 h-9 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-600 font-bold text-sm">{pitch.sender.name[0]}</div>
-                    }
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-gray-900">{pitch.sender.name}</span>
-                        <span className="text-xs text-gray-400">{pitch.sender.companyName}</span>
-                        {pitch.status === 'unread' && <span className="text-xs bg-indigo-600 text-white px-1.5 rounded-full">NEW</span>}
-                        {pitch.status === 'saved' && <span className="text-xs bg-green-100 text-green-700 px-1.5 rounded-full">保存済み</span>}
-                      </div>
-                      <p className="text-sm font-medium text-gray-800 mt-0.5 truncate">{pitch.title}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[pitch.category]}`}>
-                          {CATEGORY_LABELS[pitch.category]}
-                        </span>
-                        {pitch.attachments.length > 0 && (
-                          <span className="text-xs text-gray-400 flex items-center gap-0.5">
-                            <FileText className="w-3 h-3" /> {pitch.attachments.length}件の資料
+                <div key={pitch.id}
+                  className={`bg-white rounded-xl border p-4 transition ${pitch.status === 'unread' ? 'border-indigo-300' : 'border-gray-200'}`}>
+                  <Link to={`/pitch/${pitch.id}`} className="block hover:opacity-80 transition">
+                    <div className="flex items-start gap-3">
+                      {pitch.sender.avatarUrl
+                        ? <img src={pitch.sender.avatarUrl} className="w-9 h-9 rounded-full flex-shrink-0" alt="" />
+                        : <div className="w-9 h-9 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-600 font-bold text-sm">{pitch.sender.name[0]}</div>
+                      }
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-semibold text-gray-900">{pitch.sender.name}</span>
+                          <span className="text-xs text-gray-400">{pitch.sender.companyName}</span>
+                          {pitch.status === 'unread' && <span className="text-xs bg-indigo-600 text-white px-1.5 rounded-full">NEW</span>}
+                          {pitch.status === 'saved' && <span className="text-xs bg-green-100 text-green-700 px-1.5 rounded-full">保存済み</span>}
+                        </div>
+                        <p className="text-sm font-medium text-gray-800 mt-0.5 truncate">{pitch.title}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[pitch.category]}`}>
+                            {CATEGORY_LABELS[pitch.category]}
                           </span>
-                        )}
-                        <span className="text-xs text-gray-400 ml-auto">
-                          {formatDistanceToNow(new Date(pitch.createdAt), { addSuffix: true, locale: ja })}
-                        </span>
+                          {pitch.attachments.length > 0 && (
+                            <span className="text-xs text-gray-400 flex items-center gap-0.5">
+                              <FileText className="w-3 h-3" /> {pitch.attachments.length}件の資料
+                            </span>
+                          )}
+                          <span className="text-xs text-gray-400 ml-auto">
+                            {formatDistanceToNow(new Date(pitch.createdAt), { addSuffix: true, locale: ja })}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0 mt-1" />
+                    </div>
+                  </Link>
+
+                  {/* 却下理由の表示 */}
+                  {pitch.status === 'dismissed' && pitch.dismissReason && (
+                    <div className="mt-3 bg-gray-100 rounded-lg px-3 py-2 text-xs text-gray-600">
+                      <span className="font-medium text-gray-500">却下理由：</span>{pitch.dismissReason}
+                    </div>
+                  )}
+
+                  {/* 却下メモ入力欄（却下ボタン押下時に展開） */}
+                  {dismissingId === pitch.id ? (
+                    <div className="mt-3 border-t border-gray-100 pt-3">
+                      <textarea autoFocus value={reasonDraft} onChange={e => setReasonDraft(e.target.value)}
+                        placeholder="何をもって却下したか（例：予算超過 / 要件不一致 / 時期尚早）"
+                        rows={2}
+                        className="w-full resize-none border border-gray-200 rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400 mb-2" />
+                      <div className="flex justify-end gap-1.5">
+                        <button onClick={() => { setDismissingId(null); setReasonDraft(''); }}
+                          className="text-xs font-medium text-gray-500 px-2.5 py-1 rounded-lg hover:bg-gray-100">やめる</button>
+                        <button onClick={() => confirmDismiss(pitch.id)}
+                          className="text-xs font-medium text-white bg-gray-700 px-2.5 py-1 rounded-lg hover:bg-gray-800">却下する</button>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0 mt-1" />
-                  </div>
-                </button>
+                  ) : (
+                    <div className="mt-3 border-t border-gray-100 pt-3 flex justify-end gap-1.5">
+                      <button onClick={() => handlePitchAction(pitch.id, 'saved')}
+                        className="text-xs font-medium text-green-700 px-2.5 py-1 rounded-lg hover:bg-green-50">保存</button>
+                      <button onClick={() => { setDismissingId(pitch.id); setReasonDraft(pitch.dismissReason ?? ''); }}
+                        className="text-xs font-medium text-gray-500 px-2.5 py-1 rounded-lg hover:bg-gray-100">却下</button>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
@@ -453,10 +418,6 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-
-      {activePitch && (
-        <PitchModal pitch={activePitch} onClose={() => setActivePitch(null)} onAction={handlePitchAction} />
-      )}
     </div>
   );
 }
