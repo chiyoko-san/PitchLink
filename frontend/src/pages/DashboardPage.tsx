@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Building2, Plus, Trash2, Pencil, Check, X,
   Bell, Mail, Slack, Copy, Eye, Settings,
@@ -18,6 +18,9 @@ type Tab = 'pitches' | 'departments' | 'settings';
 
 // 無料枠で開ける件数（新しい順にこの件数まで無料。それより古い資料はロック）
 const FREE_VISIBLE_COUNT = 5;
+
+// 無料版で作れる部署の上限（これ以上は有料版が必要）
+const FREE_DEPT_LIMIT = 8;
 
 
 const ALL_CATEGORIES: { value: Category; label: string }[] = [
@@ -90,6 +93,7 @@ function DeptForm({
 }
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('pitches');
   const [pitches, setPitches] = useState(mockPitches);
   const [departments, setDepartments] = useState(mockCompany.departments);
@@ -100,6 +104,17 @@ export default function DashboardPage() {
   const [copied, setCopied] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'all' | 'unread' | 'saved'>('all');
   const [isPaid, setIsPaid] = useState(false); // 有料版フラグ（実際はプラン判定に接続）
+  // 受け取り条件（売り手向けに公開ページで掲示される）
+  const [conditions, setConditions] = useState<string[]>(mockCompany.receivingConditions ?? []);
+  const [conditionDraft, setConditionDraft] = useState('');
+
+  const addCondition = () => {
+    const v = conditionDraft.trim();
+    if (!v) return;
+    setConditions(prev => [...prev, v]);
+    setConditionDraft('');
+  };
+  const removeCondition = (i: number) => setConditions(prev => prev.filter((_, idx) => idx !== i));
 
   const publicUrl = `https://chiyoko-san.github.io/PitchLink/company/${mockCompany.slug}`;
   const unreadCount = pitches.filter(p => p.status === 'unread').length;
@@ -230,7 +245,7 @@ export default function DashboardPage() {
                 <p className="text-sm text-amber-800 flex-1">
                   無料版では直近{FREE_VISIBLE_COUNT}件まで閲覧できます。古い{lockedCount}件は有料版で閲覧可能です。
                 </p>
-                <button onClick={() => setIsPaid(true)}
+                <button onClick={() => navigate('/billing')}
                   className="text-xs font-semibold text-white bg-amber-600 px-3 py-1.5 rounded-lg hover:bg-amber-700 transition flex-shrink-0">
                   有料版にする
                 </button>
@@ -261,7 +276,7 @@ export default function DashboardPage() {
                           {formatDistanceToNow(new Date(pitch.createdAt), { addSuffix: true, locale: ja })}に受信
                         </p>
                       </div>
-                      <button onClick={() => setIsPaid(true)}
+                      <button onClick={() => navigate('/billing')}
                         className="text-xs font-semibold text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition flex-shrink-0">
                         有料版で見る
                       </button>
@@ -345,11 +360,33 @@ export default function DashboardPage() {
                 <h2 className="text-base font-bold text-gray-900">部署一覧</h2>
                 <p className="text-xs text-gray-500 mt-0.5">部署ごとに営業資料の受け取り設定ができます</p>
               </div>
-              <button onClick={() => setShowAddDept(true)}
+              <button
+                onClick={() => {
+                  // 無料版で上限に達していたら課金ページへ
+                  if (!isPaid && departments.length >= FREE_DEPT_LIMIT) {
+                    navigate('/billing');
+                  } else {
+                    setShowAddDept(true);
+                  }
+                }}
                 className="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition">
                 <Plus className="w-4 h-4" /> 部署を追加
               </button>
             </div>
+
+            {/* 部署上限の案内（無料版で上限に達したとき） */}
+            {!isPaid && departments.length >= FREE_DEPT_LIMIT && (
+              <div className="mb-4 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <Lock className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                <p className="text-sm text-amber-800 flex-1">
+                  無料版で作成できる部署は{FREE_DEPT_LIMIT}個までです。9個目以降は有料版が必要です。
+                </p>
+                <button onClick={() => navigate('/billing')}
+                  className="text-xs font-semibold text-white bg-amber-600 px-3 py-1.5 rounded-lg hover:bg-amber-700 transition flex-shrink-0">
+                  有料版にする
+                </button>
+              </div>
+            )}
 
             {showAddDept && (
               <div className="mb-4">
@@ -419,6 +456,43 @@ export default function DashboardPage() {
                 </button>
               </div>
               <p className="text-xs text-gray-400 mt-2">💡 HPのフッターや問い合わせページへの設置がおすすめです</p>
+            </div>
+
+            {/* 受け取り条件の設定 */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-5">
+              <h3 className="font-bold text-gray-900 mb-1">提案を受け取る条件</h3>
+              <p className="text-xs text-gray-500 mb-4">
+                ここで設定した条件は公開ページに掲示され、営業担当者が提案を送る前に確認できます。条件を明確にするほど、的外れな提案が減ります。
+              </p>
+
+              <div className="space-y-2 mb-3">
+                {conditions.length === 0 && (
+                  <p className="text-sm text-gray-400">まだ条件が設定されていません。</p>
+                )}
+                {conditions.map((cond, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                    <Check className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-700 flex-1">{cond}</span>
+                    <button onClick={() => removeCondition(i)}
+                      className="text-gray-400 hover:text-red-500 p-1">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  value={conditionDraft}
+                  onChange={e => setConditionDraft(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') addCondition(); }}
+                  placeholder="例：導入実績が3社以上あること"
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400" />
+                <button onClick={addCondition}
+                  className="flex items-center gap-1 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition">
+                  <Plus className="w-4 h-4" /> 追加
+                </button>
+              </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-200 p-5">

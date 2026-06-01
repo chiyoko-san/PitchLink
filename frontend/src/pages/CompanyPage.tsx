@@ -1,4 +1,4 @@
-import { Building2, Globe, Mail, Send } from 'lucide-react';
+import { Building2, Globe, Mail, Send, ClipboardCheck, Check } from 'lucide-react';
 import { mockCompany } from '../utils/mockData';
 import { CATEGORY_LABELS, CATEGORY_COLORS } from '../types';
 
@@ -66,6 +66,27 @@ export default function CompanyPage() {
             ))}
           </div>
         </section>
+
+        {/* 受け取り条件 */}
+        {company.receivingConditions && company.receivingConditions.length > 0 && (
+          <section className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <ClipboardCheck className="w-5 h-5 text-indigo-600" />
+              <h2 className="text-lg font-semibold text-gray-800">提案を受け取る条件</h2>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              以下の条件に合う提案をお待ちしています。条件に沿った資料ほど、検討されやすくなります。
+            </p>
+            <ul className="space-y-2">
+              {company.receivingConditions.map((cond, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                  <Check className="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" />
+                  <span>{cond}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* Send Pitch Form */}
         <section id="send-pitch" className="bg-white rounded-2xl border border-gray-200 p-6">
