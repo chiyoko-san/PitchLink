@@ -30,6 +30,26 @@ export const mockPitches: Pitch[] = [
     category: 'marketing',
     status: 'unread',
     createdAt: '2024-11-20T10:30:00Z',
+    original: {
+      headline: '貴社のマーケティング体制に合わせた運用プランをご用意しました',
+      points: [
+        '現在ご利用中の広告媒体に追加導入できる構成',
+        '繁忙期を避けた段階的な導入スケジュール案つき',
+        'マーケティング部の運用工数を想定した初期設定の代行',
+      ],
+    },
+    reading: {
+      materialName: 'AdPilot_サービス資料.pdf',
+      pages: [
+        { page: 1, seconds: 8 },
+        { page: 2, seconds: 14 },
+        { page: 3, seconds: 47 },
+        { page: 4, seconds: 12 },
+        { page: 5, seconds: 92 },
+        { page: 6, seconds: 22 },
+        { page: 7, seconds: 6 },
+      ],
+    },
   },
   {
     id: 'p2',
