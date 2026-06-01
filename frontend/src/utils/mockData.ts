@@ -7,6 +7,12 @@ export const mockCompany: Company = {
   description: 'テクノロジーで日本のビジネスをより良くする会社です。',
   industry: 'IT・テクノロジー',
   website: 'https://acme.example.com',
+  receivingConditions: [
+    '導入実績が3社以上あるサービス',
+    '初期費用と月額費用が資料に明記されていること',
+    '無料トライアルまたはデモが可能なもの',
+    '中小企業向けの料金プランがあること',
+  ],
   departments: [
     { id: 'd1', companyId: '1', name: 'マーケティング部', category: 'marketing', contactEmail: 'marketing@acme.example.com', allowPitches: true },
     { id: 'd2', companyId: '1', name: 'システム部', category: 'system', contactEmail: 'system@acme.example.com', allowPitches: true },
