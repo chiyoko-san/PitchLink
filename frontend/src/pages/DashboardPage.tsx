@@ -294,17 +294,16 @@ export default function DashboardPage() {
             </div>
 
             {/* カテゴリ（部署）で絞り込み */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              <button onClick={() => setFilterCategory('all')}
-                className={`text-xs px-3 py-1 rounded-full font-medium transition ${filterCategory === 'all' ? 'bg-gray-800 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'}`}>
-                すべての部署
-              </button>
-              {(Object.keys(CATEGORY_LABELS) as Category[]).map(cat => (
-                <button key={cat} onClick={() => setFilterCategory(cat)}
-                  className={`text-xs px-3 py-1 rounded-full font-medium transition ${filterCategory === cat ? 'bg-gray-800 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'}`}>
-                  {CATEGORY_LABELS[cat]}
-                </button>
-              ))}
+            <div className="mb-4">
+              <select
+                value={filterCategory}
+                onChange={e => setFilterCategory(e.target.value as Category | 'all')}
+                className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-700 outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer">
+                <option value="all">すべての部署</option>
+                {(Object.keys(CATEGORY_LABELS) as Category[]).map(cat => (
+                  <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
+                ))}
+              </select>
             </div>
 
             {/* 無料枠の案内バナー（古い資料がロックされているとき） */}
