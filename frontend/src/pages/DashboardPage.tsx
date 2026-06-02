@@ -7,6 +7,7 @@ import {
   ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { mockCompany, mockPitches } from '../utils/mockData';
+import Footer from '../components/Footer';
 import {
   CATEGORY_LABELS, CATEGORY_COLORS,
   type Category, type Department
@@ -543,6 +544,8 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }
