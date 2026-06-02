@@ -4,7 +4,8 @@ import {
   Building2, Plus, Trash2, Pencil, Check, X,
   Bell, Mail, Slack, Copy, Eye, Settings,
   FileText, ChevronRight, Lock,
-  ToggleLeft, ToggleRight
+  ToggleLeft, ToggleRight,
+  CreditCard, HelpCircle, PanelLeftClose, PanelLeft, LogOut
 } from 'lucide-react';
 import { mockCompany, mockPitches } from '../utils/mockData';
 import Footer from '../components/Footer';
@@ -95,6 +96,7 @@ function DeptForm({
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(true); // サイドバーの開閉
   const [tab, setTab] = useState<Tab>('pitches');
   const [pitches, setPitches] = useState(mockPitches);
   const [departments, setDepartments] = useState(mockCompany.departments);
@@ -104,6 +106,7 @@ export default function DashboardPage() {
   const [editingDeptId, setEditingDeptId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'all' | 'unread' | 'saved'>('all');
+  const [filterCategory, setFilterCategory] = useState<Category | 'all'>('all');
   const [isPaid, setIsPaid] = useState(false); // 有料版フラグ（実際はプラン判定に接続）
   // 受け取り条件（売り手向けに公開ページで掲示される）
   const [conditions, setConditions] = useState<string[]>(mockCompany.receivingConditions ?? []);
@@ -122,6 +125,9 @@ export default function DashboardPage() {
   const savedCount = pitches.filter(p => p.status === 'saved').length;
 
   const filteredPitches = pitches.filter(p => {
+    // カテゴリで絞り込み
+    if (filterCategory !== 'all' && p.category !== filterCategory) return false;
+    // ステータスで絞り込み
     if (filterStatus === 'unread') return p.status === 'unread';
     if (filterStatus === 'saved') return p.status === 'saved';
     return p.status !== 'blocked' && p.status !== 'dismissed';
@@ -167,15 +173,82 @@ export default function DashboardPage() {
     setDepartments(prev => prev.map(d => d.id === id ? { ...d, allowPitches: !d.allowPitches } : d));
   };
 
+  // サイドバーのメニュー定義
+  const navItems = [
+    { key: 'pitches' as Tab, label: '受信トレイ', icon: Bell, badge: unreadCount },
+    { key: 'departments' as Tab, label: '部署設定', icon: Settings },
+    { key: 'settings' as Tab, label: '会社設定', icon: Building2 },
+  ];
+  const linkItems = [
+    { label: '料金プラン', icon: CreditCard, to: '/billing' },
+    { label: 'ヘルプ', icon: HelpCircle, to: '/faq' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="font-bold text-indigo-600 text-lg">PitchLink</span>
-          <span className="text-gray-300">|</span>
-          <span className="text-sm font-medium text-gray-700">{mockCompany.name}</span>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* サイドバー */}
+      <aside className={`${sidebarOpen ? 'w-60' : 'w-16'} bg-white border-r border-gray-200 flex flex-col transition-all duration-200 sticky top-0 h-screen`}>
+        {/* ロゴ + 開閉ボタン */}
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100">
+          {sidebarOpen && <span className="font-bold text-indigo-600 text-lg">PitchLink</span>}
+          <button onClick={() => setSidebarOpen(v => !v)}
+            className="text-gray-400 hover:text-gray-700 p-1">
+            {sidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeft className="w-5 h-5" />}
+          </button>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* 会社名 */}
+        {sidebarOpen && (
+          <div className="px-4 py-3 border-b border-gray-100">
+            <p className="text-xs text-gray-400">ログイン中</p>
+            <p className="text-sm font-medium text-gray-700 truncate">{mockCompany.name}</p>
+          </div>
+        )}
+
+        {/* メインメニュー（タブ切替） */}
+        <nav className="flex-1 px-2 py-3 space-y-1">
+          {navItems.map(({ key, label, icon: Icon, badge }) => (
+            <button key={key} onClick={() => setTab(key)}
+              title={!sidebarOpen ? label : undefined}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${tab === key ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'} ${sidebarOpen ? '' : 'justify-center'}`}>
+              <Icon className="w-5 h-5 flex-shrink-0" />
+              {sidebarOpen && <span className="flex-1 text-left">{label}</span>}
+              {sidebarOpen && badge != null && badge > 0 && (
+                <span className="bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">{badge}</span>
+              )}
+              {!sidebarOpen && badge != null && badge > 0 && (
+                <span className="absolute right-2 bg-red-500 text-white text-xs w-2 h-2 rounded-full" />
+              )}
+            </button>
+          ))}
+
+          <div className="border-t border-gray-100 my-2" />
+
+          {/* リンクメニュー（別ページ） */}
+          {linkItems.map(({ label, icon: Icon, to }) => (
+            <Link key={label} to={to}
+              title={!sidebarOpen ? label : undefined}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition ${sidebarOpen ? '' : 'justify-center'}`}>
+              <Icon className="w-5 h-5 flex-shrink-0" />
+              {sidebarOpen && <span>{label}</span>}
+            </Link>
+          ))}
+        </nav>
+
+        {/* 最下部: ログアウト */}
+        <div className="px-2 py-3 border-t border-gray-100">
+          <Link to="/login"
+            title={!sidebarOpen ? 'ログアウト' : undefined}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-50 transition ${sidebarOpen ? '' : 'justify-center'}`}>
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            {sidebarOpen && <span>ログアウト</span>}
+          </Link>
+        </div>
+      </aside>
+
+      {/* 右側: 上部バー + メイン */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        <header className="bg-white border-b border-gray-200 px-6 h-16 flex items-center justify-end gap-2">
           {unreadCount > 0 && (
             <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{unreadCount}件未読</span>
           )}
@@ -188,28 +261,9 @@ export default function DashboardPage() {
             className="flex items-center gap-1.5 text-sm text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition">
             <Eye className="w-3.5 h-3.5" /> 公開ページを見る
           </a>
-        </div>
-      </header>
+        </header>
 
-      <div className="bg-white border-b border-gray-200 px-6">
-        <div className="flex gap-1">
-          {([
-            { key: 'pitches', label: '受信トレイ', icon: Bell },
-            { key: 'departments', label: '部署設定', icon: Settings },
-            { key: 'settings', label: '会社設定', icon: Building2 },
-          ] as const).map(({ key, label, icon: Icon }) => (
-            <button key={key} onClick={() => setTab(key)}
-              className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 transition ${tab === key ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
-              <Icon className="w-4 h-4" /> {label}
-              {key === 'pitches' && unreadCount > 0 && (
-                <span className="ml-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">{unreadCount}</span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 py-6">
+        <div className="flex-1 max-w-3xl w-full mx-auto px-4 py-6">
 
         {tab === 'pitches' && (
           <div>
@@ -226,7 +280,7 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-3">
               {([
                 { key: 'all', label: 'すべて' },
                 { key: 'unread', label: '未読のみ' },
@@ -235,6 +289,20 @@ export default function DashboardPage() {
                 <button key={f.key} onClick={() => setFilterStatus(f.key)}
                   className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${filterStatus === f.key ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}>
                   {f.label}
+                </button>
+              ))}
+            </div>
+
+            {/* カテゴリ（部署）で絞り込み */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <button onClick={() => setFilterCategory('all')}
+                className={`text-xs px-3 py-1 rounded-full font-medium transition ${filterCategory === 'all' ? 'bg-gray-800 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'}`}>
+                すべての部署
+              </button>
+              {(Object.keys(CATEGORY_LABELS) as Category[]).map(cat => (
+                <button key={cat} onClick={() => setFilterCategory(cat)}
+                  className={`text-xs px-3 py-1 rounded-full font-medium transition ${filterCategory === cat ? 'bg-gray-800 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'}`}>
+                  {CATEGORY_LABELS[cat]}
                 </button>
               ))}
             </div>
@@ -543,9 +611,10 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
-      </div>
+        </div>
 
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 }
