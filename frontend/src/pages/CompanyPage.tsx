@@ -1,4 +1,5 @@
 import { Building2, Globe, Mail, Send, ClipboardCheck, Check } from 'lucide-react';
+import Footer from '../components/Footer';
 import { mockCompany } from '../utils/mockData';
 import { CATEGORY_LABELS, CATEGORY_COLORS } from '../types';
 
@@ -123,6 +124,8 @@ export default function CompanyPage() {
           </div>
         </section>
       </div>
+
+      <Footer />
     </div>
   );
 }

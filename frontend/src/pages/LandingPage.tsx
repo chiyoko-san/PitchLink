@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { PhoneOff, Send, FileText, Shield, ChevronRight } from 'lucide-react';
+import Footer from '../components/Footer';
 
 export default function LandingPage() {
   return (
@@ -91,9 +92,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="bg-gray-900 text-gray-400 text-center py-8 text-sm">
-        © 2024 PitchLink. All rights reserved.
-      </footer>
+      <Footer />
     </div>
   );
 }
