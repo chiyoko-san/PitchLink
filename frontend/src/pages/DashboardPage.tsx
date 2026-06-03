@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Building2, Plus, Trash2, Pencil, Check, X,
   Bell, Mail, Slack, Copy, Eye, Settings,
-  FileText, ChevronRight, Lock,
+  FileText, ChevronRight, Lock, Search,
   ToggleLeft, ToggleRight,
   CreditCard, HelpCircle, PanelLeftClose, PanelLeft, LogOut
 } from 'lucide-react';
@@ -105,8 +105,11 @@ export default function DashboardPage() {
   const [showAddDept, setShowAddDept] = useState(false);
   const [editingDeptId, setEditingDeptId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<'all' | 'unread' | 'saved'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'unread' | 'saved' | 'dismissed'>('all');
   const [filterCategory, setFilterCategory] = useState<Category | 'all'>('all');
+  const [keyword, setKeyword] = useState('');        // キーワード検索
+  const [dateFrom, setDateFrom] = useState('');       // 期間（開始）
+  const [dateTo, setDateTo] = useState('');           // 期間（終了）
   const [isPaid, setIsPaid] = useState(false); // 有料版フラグ（実際はプラン判定に接続）
   // 受け取り条件（売り手向けに公開ページで掲示される）
   const [conditions, setConditions] = useState<string[]>(mockCompany.receivingConditions ?? []);
@@ -127,14 +130,30 @@ export default function DashboardPage() {
   const filteredPitches = pitches.filter(p => {
     // カテゴリで絞り込み
     if (filterCategory !== 'all' && p.category !== filterCategory) return false;
+
+    // キーワード検索（タイトル・送信者名・会社名）
+    if (keyword.trim()) {
+      const kw = keyword.trim().toLowerCase();
+      const target = `${p.title} ${p.sender.name} ${p.sender.companyName}`.toLowerCase();
+      if (!target.includes(kw)) return false;
+    }
+
+    // 期間で絞り込み（受信日）
+    const created = new Date(p.createdAt).getTime();
+    if (dateFrom && created < new Date(dateFrom).getTime()) return false;
+    if (dateTo && created > new Date(dateTo).getTime() + 86400000) return false; // 終了日を含む
+
     // ステータスで絞り込み
     if (filterStatus === 'unread') return p.status === 'unread';
     if (filterStatus === 'saved') return p.status === 'saved';
+    if (filterStatus === 'dismissed') return p.status === 'dismissed';
     return p.status !== 'blocked' && p.status !== 'dismissed';
   }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // ロック対象の件数（無料枠を超えた古い資料の数）
-  const lockedCount = isPaid ? 0 : Math.max(0, filteredPitches.length - FREE_VISIBLE_COUNT);
+  // 絞り込み中はロックを適用しない（全件を新着順に見ているときのみ有効）
+  const noFilter = filterStatus === 'all' && filterCategory === 'all' && !keyword && !dateFrom && !dateTo;
+  const lockedCount = (isPaid || !noFilter) ? 0 : Math.max(0, filteredPitches.length - FREE_VISIBLE_COUNT);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(publicUrl);
@@ -285,6 +304,7 @@ export default function DashboardPage() {
                 { key: 'all', label: 'すべて' },
                 { key: 'unread', label: '未読のみ' },
                 { key: 'saved', label: '保存済み' },
+                { key: 'dismissed', label: '却下済み' },
               ] as const).map(f => (
                 <button key={f.key} onClick={() => setFilterStatus(f.key)}
                   className={`text-sm px-3 py-1.5 rounded-full font-medium transition ${filterStatus === f.key ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}>
@@ -293,8 +313,19 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {/* カテゴリ（部署）で絞り込み */}
-            <div className="mb-4">
+            {/* キーワード・部署・期間で絞り込み */}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {/* キーワード検索 */}
+              <div className="relative flex-1 min-w-[180px]">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  value={keyword}
+                  onChange={e => setKeyword(e.target.value)}
+                  placeholder="会社名・担当者・タイトルで検索"
+                  className="w-full text-sm border border-gray-200 rounded-lg pl-9 pr-3 py-2 outline-none focus:ring-2 focus:ring-indigo-400" />
+              </div>
+
+              {/* 部署ドロップダウン */}
               <select
                 value={filterCategory}
                 onChange={e => setFilterCategory(e.target.value as Category | 'all')}
@@ -304,6 +335,24 @@ export default function DashboardPage() {
                   <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
                 ))}
               </select>
+
+              {/* 期間指定 */}
+              <div className="flex items-center gap-1 text-sm text-gray-500">
+                <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+                  className="border border-gray-200 rounded-lg px-2 py-2 outline-none focus:ring-2 focus:ring-indigo-400 text-gray-700" />
+                <span>〜</span>
+                <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+                  className="border border-gray-200 rounded-lg px-2 py-2 outline-none focus:ring-2 focus:ring-indigo-400 text-gray-700" />
+              </div>
+
+              {/* 絞り込みクリア（何か指定があるとき） */}
+              {(keyword || dateFrom || dateTo || filterCategory !== 'all') && (
+                <button
+                  onClick={() => { setKeyword(''); setDateFrom(''); setDateTo(''); setFilterCategory('all'); }}
+                  className="text-xs text-gray-500 underline hover:text-gray-700">
+                  条件をクリア
+                </button>
+              )}
             </div>
 
             {/* 無料枠の案内バナー（古い資料がロックされているとき） */}
@@ -328,7 +377,7 @@ export default function DashboardPage() {
                 </div>
               )}
               {filteredPitches.map((pitch, idx) => {
-                const locked = !isPaid && idx >= FREE_VISIBLE_COUNT;
+                const locked = !isPaid && noFilter && idx >= FREE_VISIBLE_COUNT;
                 return (
                 <div key={pitch.id}
                   className={`bg-white rounded-xl border p-4 transition ${pitch.status === 'unread' ? 'border-indigo-300' : 'border-gray-200'}`}>
