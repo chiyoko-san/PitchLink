@@ -7,6 +7,13 @@ import { ja } from 'date-fns/locale';
 
 const ALL_CATEGORIES: Category[] = ['marketing', 'system', 'hr', 'finance', 'executive', 'other'];
 
+// お知らせ・配信情報（将来は匿名化した業界トレンドを配信する枠）
+const INFO_FEED: { id: string; type: 'trend' | 'notice'; title: string; date: string }[] = [
+  { id: 'i1', type: 'trend', title: '今月、SaaS系の提案でデモ動画つきの開封率が伸びています', date: '3日前' },
+  { id: 'i2', type: 'notice', title: 'PitchLinkに資料のページ別閲覧分析（有料版）が追加されました', date: '1週間前' },
+  { id: 'i3', type: 'trend', title: '人事領域では「導入実績」を明記した提案が保存されやすい傾向', date: '2週間前' },
+];
+
 export default function TimelinePage() {
   const [pitches, setPitches] = useState<Pitch[]>(mockPitches);
   const [filter, setFilter] = useState<Category | 'all'>('all');
@@ -55,6 +62,27 @@ export default function TimelinePage() {
             </button>
           ))}
         </div>
+
+        {/* 業界のお知らせ・配信情報（将来は匿名化した業界トレンドを配信） */}
+        {filter === 'all' && (
+          <section className="mb-4 bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Bell className="w-4 h-4 text-indigo-600" />
+              <h2 className="text-sm font-semibold text-gray-800">お知らせ・配信情報</h2>
+            </div>
+            <ul className="space-y-2">
+              {INFO_FEED.map(item => (
+                <li key={item.id} className="flex items-start gap-2 text-sm">
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${item.type === 'trend' ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-100 text-gray-500'}`}>
+                    {item.type === 'trend' ? '業界トレンド' : 'お知らせ'}
+                  </span>
+                  <span className="text-gray-700 flex-1">{item.title}</span>
+                  <span className="text-xs text-gray-400 flex-shrink-0">{item.date}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* Pitch List */}
         <div className="space-y-3">

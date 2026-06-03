@@ -4,8 +4,9 @@ import {
   Building2, Plus, Trash2, Pencil, Check, X,
   Bell, Mail, Slack, Copy, Eye, Settings,
   FileText, ChevronRight, Lock, Search,
+  SlidersHorizontal, ChevronUp, ChevronDown,
   ToggleLeft, ToggleRight,
-  CreditCard, HelpCircle, PanelLeftClose, PanelLeft, LogOut
+  CreditCard, HelpCircle, PanelLeftClose, PanelLeft, LogOut, Clock
 } from 'lucide-react';
 import { mockCompany, mockPitches } from '../utils/mockData';
 import Footer from '../components/Footer';
@@ -110,6 +111,7 @@ export default function DashboardPage() {
   const [keyword, setKeyword] = useState('');        // キーワード検索
   const [dateFrom, setDateFrom] = useState('');       // 期間（開始）
   const [dateTo, setDateTo] = useState('');           // 期間（終了）
+  const [showFilters, setShowFilters] = useState(false); // フィルターの表示/非表示
   const [isPaid, setIsPaid] = useState(false); // 有料版フラグ（実際はプラン判定に接続）
   // 受け取り条件（売り手向けに公開ページで掲示される）
   const [conditions, setConditions] = useState<string[]>(mockCompany.receivingConditions ?? []);
@@ -199,6 +201,7 @@ export default function DashboardPage() {
     { key: 'settings' as Tab, label: '会社設定', icon: Building2 },
   ];
   const linkItems = [
+    { label: 'タイムライン', icon: Clock, to: `/company/${mockCompany.slug}/timeline` },
     { label: '料金プラン', icon: CreditCard, to: '/billing' },
     { label: 'ヘルプ', icon: HelpCircle, to: '/faq' },
   ];
@@ -299,6 +302,16 @@ export default function DashboardPage() {
               ))}
             </div>
 
+            {/* フィルター表示切替 */}
+            <button onClick={() => setShowFilters(v => !v)}
+              className="flex items-center gap-1.5 text-sm text-gray-600 mb-3 hover:text-gray-900">
+              <SlidersHorizontal className="w-4 h-4" />
+              絞り込み
+              {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+
+            {showFilters && (
+            <div>
             <div className="flex gap-2 mb-3">
               {([
                 { key: 'all', label: 'すべて' },
@@ -354,6 +367,8 @@ export default function DashboardPage() {
                 </button>
               )}
             </div>
+            </div>
+            )}
 
             {/* 無料枠の案内バナー（古い資料がロックされているとき） */}
             {lockedCount > 0 && (

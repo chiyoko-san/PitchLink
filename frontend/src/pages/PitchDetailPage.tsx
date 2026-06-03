@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft, Mail, FileText, Video, Link as LinkIcon,
-  Bookmark, Trash2, Flag, Star, Lock, ExternalLink,
+  Bookmark, Trash2, Flag, Star, ExternalLink,
 } from 'lucide-react';
 import { mockPitches } from '../utils/mockData';
 import { CATEGORY_LABELS, CATEGORY_COLORS, type Attachment } from '../types';
@@ -25,9 +24,6 @@ export default function PitchDetailPage() {
   const { id } = useParams();
   const pitch = mockPitches.find(p => p.id === id);
 
-  // 有料版判定（実際はプラン判定に接続）。デモ用にトグルで切替。
-  const [isPaid, setIsPaid] = useState(false);
-
   if (!pitch) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -38,10 +34,6 @@ export default function PitchDetailPage() {
       </div>
     );
   }
-
-  const maxSec = pitch.reading
-    ? Math.max(...pitch.reading.pages.map(p => p.seconds))
-    : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -121,51 +113,6 @@ export default function PitchDetailPage() {
             </div>
             {/* 受け手への透明性の明示（信頼維持のため） */}
             <p className="mt-3 text-xs text-gray-400">※ 資料の閲覧状況は提案元に共有されます</p>
-          </section>
-        )}
-
-        {/* 有料版: 読まれたページ分析 */}
-        {pitch.reading && (
-          <section className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                読まれたページ分析
-                <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-xs font-medium normal-case">有料版</span>
-              </h2>
-              <button onClick={() => setIsPaid(v => !v)} className="text-xs text-gray-400 underline hover:text-gray-600">
-                {isPaid ? '無料版で見る' : '有料版プレビュー'}
-              </button>
-            </div>
-
-            <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5">
-              <p className="text-sm text-gray-600 mb-4">
-                「{pitch.reading.materialName}」で、どのページが長く読まれたか
-              </p>
-              <div className={`space-y-2 ${isPaid ? '' : 'blur-sm select-none'}`}>
-                {pitch.reading.pages.map(p => (
-                  <div key={p.page} className="flex items-center gap-3">
-                    <span className="w-12 shrink-0 text-xs text-gray-500">P.{p.page}</span>
-                    <div className="flex-1 h-5 bg-gray-100 rounded overflow-hidden">
-                      <div className="h-full bg-indigo-500 rounded" style={{ width: `${(p.seconds / maxSec) * 100}%` }} />
-                    </div>
-                    <span className="w-12 shrink-0 text-right text-xs text-gray-500">{p.seconds}秒</span>
-                  </div>
-                ))}
-              </div>
-
-              {!isPaid && (
-                <div className="absolute inset-0 grid place-items-center bg-white/60">
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4 text-center">
-                    <Lock className="w-5 h-5 text-gray-400 mx-auto mb-1.5" />
-                    <p className="text-sm font-medium text-gray-900">どこが刺さったかが分かります</p>
-                    <p className="text-xs text-gray-500 mt-1">有料版で各ページの閲覧時間を確認できます</p>
-                    <button className="mt-3 bg-indigo-600 text-white text-xs font-medium px-4 py-1.5 rounded-lg hover:bg-indigo-700 transition">
-                      有料版にする
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
           </section>
         )}
 
