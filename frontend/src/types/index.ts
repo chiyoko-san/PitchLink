@@ -43,6 +43,7 @@ export interface Attachment {
 
 export interface Pitch {
   id: string;
+  refNumber: string;             // 追跡用のユニーク番号（例: PL-2024-0001）
   sender: User;
   companyId: string;
   departmentId?: string;
