@@ -25,6 +25,7 @@ export const mockCompany: Company = {
 export const mockPitches: Pitch[] = [
   {
     id: 'p1',
+    refNumber: 'PL-2024-0001',
     sender: { id: 'u1', name: '田中 太郎', companyName: 'テックソリューションズ株式会社', email: 'tanaka@tech.example.com', avatarUrl: 'https://i.pravatar.cc/40?img=1' },
     companyId: '1',
     departmentId: 'd1',
@@ -59,6 +60,7 @@ export const mockPitches: Pitch[] = [
   },
   {
     id: 'p2',
+    refNumber: 'PL-2024-0002',
     sender: { id: 'u2', name: '鈴木 花子', companyName: 'クラウドベース株式会社', email: 'suzuki@cloudbase.example.com', avatarUrl: 'https://i.pravatar.cc/40?img=5' },
     companyId: '1',
     departmentId: 'd2',
@@ -74,6 +76,7 @@ export const mockPitches: Pitch[] = [
   },
   {
     id: 'p3',
+    refNumber: 'PL-2024-0003',
     sender: { id: 'u3', name: '伊藤 健一', companyName: 'HRテック合同会社', email: 'ito@hrtech.example.com', avatarUrl: 'https://i.pravatar.cc/40?img=8' },
     companyId: '1',
     departmentId: 'd3',
@@ -88,6 +91,7 @@ export const mockPitches: Pitch[] = [
   },
   {
     id: 'p4',
+    refNumber: 'PL-2024-0004',
     sender: { id: 'u4', name: '山本 三郎', companyName: 'オフィスサプライ株式会社', email: 'yamamoto@office.example.com', avatarUrl: 'https://i.pravatar.cc/40?img=12' },
     companyId: '1', departmentId: 'd4',
     title: 'オフィス備品の定期配送サービス',
@@ -97,6 +101,7 @@ export const mockPitches: Pitch[] = [
   },
   {
     id: 'p5',
+    refNumber: 'PL-2024-0005',
     sender: { id: 'u5', name: '中村 四郎', companyName: 'リーガルテック株式会社', email: 'nakamura@legal.example.com', avatarUrl: 'https://i.pravatar.cc/40?img=15' },
     companyId: '1', departmentId: 'd4',
     title: '契約書管理システムのご提案',
@@ -106,6 +111,7 @@ export const mockPitches: Pitch[] = [
   },
   {
     id: 'p6',
+    refNumber: 'PL-2024-0006',
     sender: { id: 'u6', name: '小林 五郎', companyName: 'グロースマーケ株式会社', email: 'kobayashi@growth.example.com', avatarUrl: 'https://i.pravatar.cc/40?img=20' },
     companyId: '1', departmentId: 'd1',
     title: 'SNS運用代行のご案内',
@@ -115,6 +121,7 @@ export const mockPitches: Pitch[] = [
   },
   {
     id: 'p7',
+    refNumber: 'PL-2024-0007',
     sender: { id: 'u7', name: '加藤 六子', companyName: 'クラウド会計株式会社', email: 'kato@account.example.com', avatarUrl: 'https://i.pravatar.cc/40?img=25' },
     companyId: '1', departmentId: 'd4',
     title: 'クラウド会計ソフトの乗り換え提案',
@@ -124,6 +131,7 @@ export const mockPitches: Pitch[] = [
   },
   {
     id: 'p8',
+    refNumber: 'PL-2024-0008',
     sender: { id: 'u8', name: '吉田 七海', companyName: 'タレントマネジメント株式会社', email: 'yoshida@talent.example.com', avatarUrl: 'https://i.pravatar.cc/40?img=30' },
     companyId: '1', departmentId: 'd3',
     title: '人材育成研修プログラムのご案内',
