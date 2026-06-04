@@ -66,9 +66,14 @@ export default function PitchDetailPage() {
 
         {/* タイトル */}
         <div className="mb-6">
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[pitch.category]}`}>
-            {CATEGORY_LABELS[pitch.category]}
-          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[pitch.category]}`}>
+              {CATEGORY_LABELS[pitch.category]}
+            </span>
+            <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+              整理番号: {pitch.refNumber}
+            </span>
+          </div>
           <h1 className="mt-2 text-xl font-bold text-gray-900">{pitch.title}</h1>
           <p className="mt-3 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{pitch.body}</p>
         </div>

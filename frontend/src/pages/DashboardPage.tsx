@@ -385,6 +385,21 @@ export default function DashboardPage() {
             )}
 
             <div className="space-y-2">
+              {/* 広告枠（無料版のみ表示） */}
+              {!isPaid && (
+                <div className="flex items-center gap-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-dashed border-gray-300 rounded-xl px-4 py-3">
+                  <span className="text-[10px] font-semibold text-gray-400 border border-gray-300 rounded px-1.5 py-0.5">AD</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-600">ここに広告が表示されます</p>
+                    <p className="text-xs text-gray-400">有料版にすると広告は表示されません</p>
+                  </div>
+                  <button onClick={() => navigate('/billing')}
+                    className="text-xs font-semibold text-indigo-600 hover:underline flex-shrink-0">
+                    非表示にする
+                  </button>
+                </div>
+              )}
+
               {filteredPitches.length === 0 && (
                 <div className="text-center py-16 text-gray-400">
                   <Bell className="w-10 h-10 mx-auto mb-2 opacity-20" />
@@ -433,6 +448,7 @@ export default function DashboardPage() {
                           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[pitch.category]}`}>
                             {CATEGORY_LABELS[pitch.category]}
                           </span>
+                          <span className="text-xs font-mono text-gray-400">{pitch.refNumber}</span>
                           {pitch.attachments.length > 0 && (
                             <span className="text-xs text-gray-400 flex items-center gap-0.5">
                               <FileText className="w-3 h-3" /> {pitch.attachments.length}件の資料

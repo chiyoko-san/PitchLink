@@ -30,6 +30,14 @@ const COMPARISON: { label: string; free: string; paid: string }[] = [
   { label: '受信トレイ・比較', free: '✓', paid: '✓' },
 ];
 
+// よくある質問
+const FAQ: { q: string; a: string }[] = [
+  { q: 'いつでも解約できますか？', a: 'はい、いつでも解約できます。解約後も、その月の請求期間が終わるまでは有料版の機能をご利用いただけます。' },
+  { q: '支払い方法は何がありますか？', a: '主要なクレジットカード（VISA / Mastercard / JCB / American Express）に対応しています。' },
+  { q: '無料版に戻すとどうなりますか？', a: '直近5件より古い資料は閲覧できなくなり、9個目以降の部署も非表示になります。データ自体は保持され、再度有料版にすると元通り閲覧できます。' },
+  { q: '請求のタイミングは？', a: 'お申し込み日を起点に毎月自動で更新・請求されます。' },
+];
+
 export default function BillingPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -158,6 +166,19 @@ export default function BillingPage() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* よくある質問 */}
+        <div className="mt-12">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">よくある質問</h2>
+          <div className="space-y-3">
+            {FAQ.map((item, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="font-medium text-gray-900 text-sm mb-1">{item.q}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">{item.a}</p>
+              </div>
+            ))}
           </div>
         </div>
       </main>
