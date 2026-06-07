@@ -1,5 +1,5 @@
 import { Building2, Globe, Mail, Send, ClipboardCheck, Check } from 'lucide-react';
-import Footer from '../components/Footer';
+import PublicLayout from '../components/PublicLayout';
 import { mockCompany } from '../utils/mockData';
 import { CATEGORY_LABELS, CATEGORY_COLORS } from '../types';
 
@@ -7,14 +7,13 @@ export default function CompanyPage() {
   const company = mockCompany;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <span className="font-bold text-indigo-600 text-lg">PitchLink</span>
+    <PublicLayout
+      headerActions={
         <a href="#send-pitch" className="bg-indigo-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
           資料を送る
         </a>
-      </header>
+      }
+    >
 
       {/* Hero */}
       <div className="bg-white border-b border-gray-200 px-6 py-10">
@@ -124,8 +123,6 @@ export default function CompanyPage() {
           </div>
         </section>
       </div>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 }

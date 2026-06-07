@@ -207,9 +207,11 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* 上段: サイドバー + 中身（横並び） */}
+      <div className="flex flex-1 min-h-0">
       {/* サイドバー */}
-      <aside className={`${sidebarOpen ? 'w-60' : 'w-16'} bg-white border-r border-gray-200 flex flex-col transition-all duration-200 sticky top-0 h-screen`}>
+      <aside className={`${sidebarOpen ? 'w-60' : 'w-16'} bg-white border-r border-gray-200 flex flex-col transition-all duration-200 sticky top-0 h-screen self-start shrink-0`}>
         {/* ロゴ + 開閉ボタン */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100">
           {sidebarOpen && <span className="font-bold text-indigo-600 text-lg">PitchLink</span>}
@@ -691,9 +693,11 @@ export default function DashboardPage() {
           </div>
         )}
         </div>
-
-        <Footer />
       </div>
+      </div>
+
+      {/* 下段: フッター（サイドバー幅を含めた画面全幅） */}
+      <Footer />
     </div>
   );
 }

@@ -145,7 +145,6 @@ export default function PitchDetailPage() {
           </button>
         </div>
       </main>
-      </main>
     </Sidebar>
   );
 }

@@ -59,7 +59,7 @@ export default function BillingPage() {
   const update = (k: keyof typeof card, v: string) => setCard(prev => ({ ...prev, [k]: v }));
 
   return (
-    <Sidebar>
+    <Sidebar footer={<Footer />}>
       <main className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">有料プランにアップグレード</h1>
         <p className="text-sm text-gray-500 mb-8">使い込むほど価値が増す機能を、すべて解放します。</p>
@@ -182,7 +182,6 @@ export default function BillingPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </Sidebar>
   );
 }

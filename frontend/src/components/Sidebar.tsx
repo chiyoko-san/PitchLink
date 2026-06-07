@@ -9,7 +9,7 @@ import { mockCompany } from '../utils/mockData';
 // 管理画面系ページで共通利用するサイドバー付きレイアウト。
 // children に各ページの中身を渡す。
 // header に各ページ独自の上部バー要素を渡せる（任意）。
-export default function Sidebar({ children, header }: { children: ReactNode; header?: ReactNode }) {
+export default function Sidebar({ children, header, footer }: { children: ReactNode; header?: ReactNode; footer?: ReactNode }) {
   const [open, setOpen] = useState(true);
   const location = useLocation();
 
@@ -24,9 +24,11 @@ export default function Sidebar({ children, header }: { children: ReactNode; hea
   const isActive = (to: string) => location.pathname === to.split('?')[0];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* 上段: サイドバー + 中身（横並び） */}
+      <div className="flex flex-1 min-h-0">
       {/* サイドバー */}
-      <aside className={`${open ? 'w-60' : 'w-16'} bg-white border-r border-gray-200 flex flex-col transition-all duration-200 sticky top-0 h-screen`}>
+      <aside className={`${open ? 'w-60' : 'w-16'} bg-white border-r border-gray-200 flex flex-col transition-all duration-200 sticky top-0 h-screen self-start shrink-0`}>
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100">
           {open && <Link to="/dashboard" className="font-bold text-indigo-600 text-lg">PitchLink</Link>}
           <button onClick={() => setOpen(v => !v)} className="text-gray-400 hover:text-gray-700 p-1">
@@ -71,6 +73,10 @@ export default function Sidebar({ children, header }: { children: ReactNode; hea
         )}
         <div className="flex-1">{children}</div>
       </div>
+      </div>
+
+      {/* 下段: フッター（サイドバー幅を含めた画面全幅） */}
+      {footer}
     </div>
   );
 }

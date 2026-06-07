@@ -1,21 +1,22 @@
 import { Link } from 'react-router-dom';
 import { PhoneOff, Send, FileText, Shield, ChevronRight } from 'lucide-react';
-import Footer from '../components/Footer';
+import PublicLayout from '../components/PublicLayout';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <header className="px-8 py-5 flex items-center justify-between border-b border-gray-100">
-        <span className="font-bold text-indigo-600 text-xl">PitchLink</span>
-        <div className="flex items-center gap-4">
+    <PublicLayout
+      bg="bg-white"
+      headerActions={
+        <>
           <Link to="/company/acme-corp" className="text-sm text-gray-600 hover:text-gray-900">公開ページデモ</Link>
           <Link to="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">管理画面デモ</Link>
           <Link to="/login" className="text-sm text-gray-600 hover:text-gray-900 font-medium">ログイン</Link>
           <Link to="/login" className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
             無料で始める
           </Link>
-        </div>
-      </header>
+        </>
+      }
+    >
 
       {/* Hero */}
       <section className="text-center px-6 py-24 max-w-3xl mx-auto">
@@ -91,8 +92,6 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 }
