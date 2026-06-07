@@ -38,7 +38,7 @@ export default function PitchDetailPage() {
   }
 
   return (
-    <Sidebar>
+    <Sidebar footer={<Footer />}>
       {/* ヘッダー */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 py-4">
