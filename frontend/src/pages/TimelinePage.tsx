@@ -4,6 +4,7 @@ import { mockPitches } from '../utils/mockData';
 import { CATEGORY_LABELS, CATEGORY_COLORS, type Category, type Pitch } from '../types';
 import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import PublicLayout from '../components/PublicLayout';
 
 const ALL_CATEGORIES: Category[] = ['marketing', 'system', 'hr', 'finance', 'executive', 'other'];
 
