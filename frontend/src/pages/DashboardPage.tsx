@@ -6,7 +6,7 @@ import {
   FileText, ChevronRight, Lock, Search,
   SlidersHorizontal, ChevronUp, ChevronDown,
   ToggleLeft, ToggleRight,
-  CreditCard, HelpCircle, PanelLeftClose, PanelLeft, LogOut, Clock
+  CreditCard, HelpCircle, PanelLeftClose, PanelLeft, LogOut, Clock, ShieldCheck
 } from 'lucide-react';
 import { mockCompany, mockPitches } from '../utils/mockData';
 import Footer from '../components/Footer';
@@ -203,6 +203,7 @@ export default function DashboardPage() {
   const linkItems = [
     { label: 'タイムライン', icon: Clock, to: `/company/${mockCompany.slug}/timeline` },
     { label: '料金プラン', icon: CreditCard, to: '/billing' },
+    { label: '運営管理', icon: ShieldCheck, to: '/admin' },
     { label: 'ヘルプ', icon: HelpCircle, to: '/faq' },
   ];
 

@@ -140,3 +140,32 @@ export const mockPitches: Pitch[] = [
     category: 'hr', status: 'read', createdAt: '2023-09-18T14:00:00Z',
   },
 ];
+
+// ===== 運営者向け管理画面（AdminPage）用のデモ集計データ =====
+// 実データはバックエンド接続後に差し替える前提のモック。
+// 全プラットフォームに登録された受け手企業の一覧を表す。
+export interface AdminCompany {
+  id: string;
+  name: string;
+  slug: string;
+  industry: string;
+  plan: 'free' | 'paid';   // 課金状態
+  pitchCount: number;       // この企業が受け取った提案数
+  departmentCount: number;  // 設定している部署数
+  registeredAt: string;     // 登録日
+}
+
+export const mockAdminCompanies: AdminCompany[] = [
+  { id: '1', name: 'ACME株式会社', slug: 'acme-corp', industry: 'IT・テクノロジー', plan: 'paid', pitchCount: 28, departmentCount: 4, registeredAt: '2024-01-01' },
+  { id: '2', name: 'みどり製造株式会社', slug: 'midori-mfg', industry: '製造業', plan: 'free', pitchCount: 6, departmentCount: 2, registeredAt: '2024-02-14' },
+  { id: '3', name: 'さくら商事株式会社', slug: 'sakura-trading', industry: '卸売・小売', plan: 'paid', pitchCount: 41, departmentCount: 6, registeredAt: '2024-03-02' },
+  { id: '4', name: 'ひかり医療法人', slug: 'hikari-medical', industry: '医療・福祉', plan: 'free', pitchCount: 3, departmentCount: 1, registeredAt: '2024-03-21' },
+  { id: '5', name: 'つばさ建設株式会社', slug: 'tsubasa-const', industry: '建設・不動産', plan: 'free', pitchCount: 9, departmentCount: 3, registeredAt: '2024-04-10' },
+  { id: '6', name: 'うみのフーズ株式会社', slug: 'umino-foods', industry: '飲食・food', plan: 'paid', pitchCount: 17, departmentCount: 3, registeredAt: '2024-05-05' },
+  { id: '7', name: 'そら金融サービス', slug: 'sora-finance', industry: '金融・保険', plan: 'paid', pitchCount: 33, departmentCount: 5, registeredAt: '2024-05-19' },
+  { id: '8', name: 'もり教育株式会社', slug: 'mori-edu', industry: '教育', plan: 'free', pitchCount: 4, departmentCount: 2, registeredAt: '2024-06-08' },
+  { id: '9', name: 'かぜロジスティクス', slug: 'kaze-logi', industry: '運輸・物流', plan: 'free', pitchCount: 11, departmentCount: 3, registeredAt: '2024-07-22' },
+  { id: '10', name: 'ほし不動産株式会社', slug: 'hoshi-estate', industry: '建設・不動産', plan: 'paid', pitchCount: 22, departmentCount: 4, registeredAt: '2024-08-30' },
+  { id: '11', name: 'なみIT株式会社', slug: 'nami-it', industry: 'IT・テクノロジー', plan: 'free', pitchCount: 7, departmentCount: 2, registeredAt: '2024-09-12' },
+  { id: '12', name: 'やまと人材株式会社', slug: 'yamato-hr', industry: '人材・コンサル', plan: 'free', pitchCount: 5, departmentCount: 2, registeredAt: '2024-10-01' },
+];

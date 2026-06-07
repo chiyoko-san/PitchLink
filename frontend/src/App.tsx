@@ -5,6 +5,7 @@ import TimelinePage from './pages/TimelinePage';
 import DashboardPage from './pages/DashboardPage';
 import PitchDetailPage from './pages/PitchDetailPage';
 import LoginPage from './pages/LoginPage';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/company/:slug/timeline" element={<TimelinePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/pitch/:id" element={<PitchDetailPage />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   );

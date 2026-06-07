@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Clock, CreditCard, HelpCircle,
-  LogOut, PanelLeftClose, PanelLeft,
+  LogOut, PanelLeftClose, PanelLeft, ShieldCheck,
 } from 'lucide-react';
 import { mockCompany } from '../utils/mockData';
 
@@ -18,6 +18,7 @@ export default function Sidebar({ children, header, footer }: { children: ReactN
     { label: 'ダッシュボード', icon: LayoutDashboard, to: '/dashboard' },
     { label: 'タイムライン', icon: Clock, to: `/company/${mockCompany.slug}/timeline` },
     { label: '料金プラン', icon: CreditCard, to: '/billing' },
+    { label: '運営管理', icon: ShieldCheck, to: '/admin' },
     { label: 'ヘルプ', icon: HelpCircle, to: '/faq' },
   ];
 
